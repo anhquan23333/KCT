@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đặt Hàng Keychain 3D</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/opentype.js@1.3.4/dist/opentype.min.js"></script>
+    <style>
+        body { font-family: 'Montserrat', sans-serif; margin: 0; min-height: 100vh; display: flex; justify-content: center; align-items: center; background: linear-gradient(45deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%); background-size: 400% 400%; animation: gradientBG 15s ease infinite; overflow: hidden; }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .blob { position: absolute; filter: blur(40px); z-index: -1; opacity: 0.8; animation: float 10s infinite ease-in-out alternate; }
+        .blob1 { width: 300px; height: 300px; background: #a18cd1; border-radius: 50%; top: -50px; left: -50px; }
+        .blob2 { width: 400px; height: 400px; background: #ffc3a0; border-radius: 50%; bottom: -100px; right: -50px; animation-delay: -5s; }
+        @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
+        
+        .card { background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15); padding: 30px; border-radius: 20px; width: 90%; max-width: 450px; max-height: 85vh; overflow-y: auto; text-align: left; z-index: 1; position: relative;}
+        /* Tùy chỉnh thanh cuộn */
+        .card::-webkit-scrollbar { width: 6px; }
+        .card::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.6); border-radius: 10px; }
+        
+        h2 { color: #fff; margin-top: 0; font-size: 24px; text-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center; border-bottom: 1px solid rgba(255,255,255,0.4); padding-bottom: 15px; margin-bottom: 20px;}
+        h3 { color: #fff; font-size: 16px; text-shadow: 0 1px 2px rgba(0,0,0,0.1); margin-top: 25px; margin-bottom: 10px;}
+        
+        .input-group { margin-bottom: 15px; }
+        label { display: block; color: #333; font-size: 13px; margin-bottom: 6px; font-weight: bold; }
+        .radio-group label { display: flex; align-items: center; font-weight: normal; font-size: 14px; margin-bottom: 8px; cursor: pointer; color: #222;}
+        .radio-group input[type="radio"] { margin-right: 8px; transform: scale(1.2); }
+        
+        input[type="text"], input[type="file"] { width: 100%; padding: 12px; font-size: 14px; font-family: 'Montserrat', sans-serif; background: rgba(255, 255, 255, 0.4); border: 1px solid rgba(255,255,255,0.6); border-radius: 10px; outline: none; color: #333; transition: 0.3s; box-sizing: border-box; }
+        input[type="text"]:focus { background: rgba(255,255,255,0.6); box-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        
+        /* Slider cho phép kéo âm/dương */
+        input[type="range"] { width: 100%; -webkit-appearance: none; background: transparent; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: #fff; cursor: pointer; margin-top: -7px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        input[type="range"]::-webkit-slider-runnable-track { width: 100%; height: 5px; cursor: pointer; background: rgba(255,255,255,0.5); border-radius: 5px; }
+        
+        #preview { background: rgba(255, 255, 255, 0.4); border: 1px solid rgba(255,255,255,0.6); padding: 20px; border-radius: 15px; font-size: 30px; font-weight: 700; min-height: 40px; display: flex; justify-content: center; align-items: center; margin-bottom: 20px; overflow: hidden; white-space: nowrap; color: #222; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
+        
+        .payment-box { background: rgba(255,255,255,0.5); border-radius: 12px; padding: 15px; text-align: center; margin-bottom: 15px; display: none; }
+        .payment-box img { max-width: 150px; border-radius: 10px; margin: 10px 0; box-shadow: 0 4px 10px rgba(0,0,0,0.1);}
+        .payment-box p { font-size: 14px; color: #d32f2f; font-weight: bold; margin: 5px 0;}
+        .payment-note { font-size: 13px; color: #222; font-weight: bold; }
+
+        button { width: 100%; background: linear-gradient(135deg, rgba(255,255,255,0.6), rgba(255,255,255,0.2)); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.6); color: #333; padding: 15px; font-size: 15px; border-radius: 12px; cursor: pointer; font-weight: bold; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-top: 10px;}
+        button:hover { background: rgba(255,255,255,0.8); transform: translateY(-2px); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        #successScreen { display: none; text-align: center; padding: 40px 20px; }
+        #successScreen h2 { border: none; font-size: 28px; margin-bottom: 10px; }
+        #successScreen p { color: #333; font-size: 16px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="blob blob1"></div>
+<div class="blob blob2"></div>
+
+<div class="card" id="formScreen">
+    <h2>📝 Đặt Hàng Keychain</h2>
+    
+    <div class="input-group">
+        <label>Họ và Tên:</label>
+        <input type="text" id="fullName" placeholder="Nhập họ và tên..." required>
+    </div>
+
+    <div class="input-group radio-group">
+        <label style="font-weight: bold;">Trường đang học hiện tại:</label>
+        <label><input type="radio" name="school" value="THPT Châu Văn Liêm"> THPT Châu Văn Liêm</label>
+        <label><input type="radio" name="school" value="Đại học"> Đại học</label>
+        <label><input type="radio" name="school" value="THCS địa bàn TP.Cần Thơ"> THCS địa bàn TP.Cần Thơ</label>
+        <label><input type="radio" name="school" id="schoolOtherRadio" value="Khác"> Khác:</label>
+        <input type="text" id="schoolOtherText" placeholder="Nhập tên trường..." style="display:none; margin-top:5px;">
+    </div>
+
+    <div class="input-group">
+        <label>Lớp học hiện tại / Cựu học sinh:</label>
+        <input type="text" id="className" placeholder="VD: 12A1 / Cựu HS 12A1...">
+    </div>
+
+    <div class="input-group">
+        <label>Số điện thoại Zalo (Cho phép người lạ nhắn):</label>
+        <input type="text" id="phone" placeholder="Nhập số điện thoại...">
+    </div>
+
+    <div class="input-group">
+        <label>Link Facebook (Cho phép người lạ nhắn):</label>
+        <input type="text" id="facebook" placeholder="Dán link Facebook...">
+    </div>
+
+    <h3>💳 Thanh Toán</h3>
+    <div class="input-group radio-group">
+        <label style="font-weight: bold;">Số lượng keychain cần đặt:</label>
+        <label><input type="radio" name="quantity" value="1"> 1 Keychain</label>
+        <label><input type="radio" name="quantity" value="2"> 2 Keychain</label>
+        <label><input type="radio" name="quantity" value="3"> 3 Keychain</label>
+    </div>
+
+    <div class="payment-box" id="paymentBox">
+        <p id="paymentText">Vui lòng thanh toán ... vào mã QR dưới đây</p>
+        <img id="paymentQR" src="" alt="Mã QR Chuyển Khoản">
+        <div class="payment-note">Nội dung chuyển khoản:<br> Họ và tên + SĐT</div>
+    </div>
+
+    <div class="input-group" id="uploadBox" style="display:none;">
+        <label>Tải lên ảnh màn hình thanh toán (JPG, PNG, PDF):</label>
+        <input type="file" id="paymentProof" accept=".jpg, .jpeg, .png, .pdf">
+    </div>
+
+    <h3>✨ Thiết Kế Tên In</h3>
+    <div class="input-group">
+        <label>Tên muốn in (Tối đa ~10 chữ cái):</label>
+        <input type="text" id="keychainName" placeholder="Nhập tên in lên keychain..." autocomplete="off">
+    </div>
+
+    <div class="input-group">
+        <label>Khoảng cách chữ: <span id="spacingValue">0</span>px</label>
+        <input type="range" id="spacingInput" min="-20" max="50" value="0">
+    </div>
+
+    <div id="preview">Tên Của Bạn</div>
+    
+    <button id="submitBtn" disabled>Đang tải dữ liệu...</button>
+</div>
+
+<div class="card" id="successScreen">
+    <h2>🎉 Đặt Hàng Thành Công!</h2>
+    <p id="thankYouMsg">Chúng mình xin cảm ơn sự ủng hộ từ ...</p>
+</div>
+
+<script>
+    // --- KHAI BÁO BIẾN ---
+    const formScreen = document.getElementById('formScreen');
+    const successScreen = document.getElementById('successScreen');
+    const thankYouMsg = document.getElementById('thankYouMsg');
+    
+    const fullName = document.getElementById('fullName');
+    const schoolRadios = document.getElementsByName('school');
+    const schoolOtherRadio = document.getElementById('schoolOtherRadio');
+    const schoolOtherText = document.getElementById('schoolOtherText');
+    const className = document.getElementById('className');
+    const phone = document.getElementById('phone');
+    const facebook = document.getElementById('facebook');
+    
+    const quantityRadios = document.getElementsByName('quantity');
+    const paymentBox = document.getElementById('paymentBox');
+    const paymentText = document.getElementById('paymentText');
+    const paymentQR = document.getElementById('paymentQR');
+    const uploadBox = document.getElementById('uploadBox');
+    const paymentProof = document.getElementById('paymentProof');
+
+    const keychainName = document.getElementById('keychainName');
+    const spacingInput = document.getElementById('spacingInput');
+    const spacingValue = document.getElementById('spacingValue');
+    const preview = document.getElementById('preview');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    let vectorFont = null;
+
+    // --- LOGIC GIAO DIỆN ---
+    
+    // 1. Tải Font 3D
+    opentype.load('https://cdn.jsdelivr.net/gh/JulietaUla/Montserrat@master/fonts/ttf/Montserrat-Bold.ttf', function(err, font) {
+        if (!err) {
+            vectorFont = font;
+            submitBtn.textContent = "Gửi Đơn Hàng & File Thiết Kế";
+            submitBtn.disabled = false;
+        }
+    });
+
+    // 2. Hiển thị ô "Khác" chọn trường học
+    schoolRadios.forEach(radio => {
+        radio.addEventListener('change', () => {
+            schoolOtherText.style.display = schoolOtherRadio.checked ? 'block' : 'none';
+        });
+    });
+
+    // 3. Logic hiển thị Mã QR theo số lượng
+    const qrData = {
+        "1": { text: "Vui lòng thanh toán 62.000 vào mã QR dưới đây", qr: "LINK_QR_1" },
+        "2": { text: "Vui lòng thanh toán 120.000 vào mã QR dưới đây", qr: "LINK_QR_2" },
+        "3": { text: "Vui lòng thanh toán 180.000 vào mã QR dưới đây", qr: "LINK_QR_3" }
+    };
+
+    quantityRadios.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            const val = e.target.value;
+            paymentText.textContent = qrData[val].text;
+            paymentQR.src = qrData[val].qr;
+            paymentBox.style.display = 'block';
+            uploadBox.style.display = 'block';
+        });
+    });
+
+    // 4. Cập nhật Preview Tên
+    function updatePreview() {
+        const text = keychainName.value.trim() || 'Tên Của Bạn';
+        const spacing = spacingInput.value;
+        preview.textContent = text;
+        preview.style.letterSpacing = spacing + 'px';
+        spacingValue.textContent = spacing;
+    }
+    keychainName.addEventListener('input', updatePreview);
+    spacingInput.addEventListener('input', updatePreview);
+
+    // --- LOGIC XỬ LÝ GỬI FORM ---
+    submitBtn.addEventListener('click', () => {
+        // Lấy dữ liệu cơ bản
+        const nameVal = fullName.value.trim();
+        const keyText = keychainName.value.trim();
+        
+        if (!nameVal || !keyText) {
+            alert('Vui lòng điền đầy đủ Họ Tên và Tên In trên Keychain!');
+            return;
+        }
+
+        // Lấy giá trị Trường học
+        let schoolVal = "";
+        for (const radio of schoolRadios) {
+            if (radio.checked) {
+                schoolVal = radio.value === "Khác" ? schoolOtherText.value : radio.value;
+                break;
+            }
+        }
+
+        // Lấy giá trị Số lượng
+        let qtyVal = "";
+        for (const radio of quantityRadios) {
+            if (radio.checked) { qtyVal = radio.value; break; }
+        }
+
+        if(!qtyVal) {
+            alert("Vui lòng chọn số lượng Keychain!"); return;
+        }
+        if(!paymentProof.files[0]) {
+            alert("Vui lòng tải lên ảnh màn hình thanh toán!"); return;
+        }
+
+        // Đổi trạng thái nút
+        submitBtn.textContent = "Đang xử lý & Gửi...";
+        submitBtn.disabled = true;
+
+        // Tạo SVG Vector
+        const spacing = parseFloat(spacingInput.value);
+        const fontSize = 100;
+        let path = new opentype.Path();
+        let x = 0; const y = 100;
+
+        for (let i = 0; i < keyText.length; i++) {
+            const char = keyText[i];
+            const charPath = vectorFont.getPath(char, x, y, fontSize);
+            path.extend(charPath);
+            x += vectorFont.getAdvanceWidth(char, fontSize) + spacing;
+        }
+
+        const boundingBox = path.getBoundingBox();
+        const padding = 10; 
+        const width = boundingBox.x2 - boundingBox.x1 + (padding * 2);
+        const height = boundingBox.y2 - boundingBox.y1 + (padding * 2);
+        const viewBox = `${boundingBox.x1 - padding} ${boundingBox.y1 - padding} ${width} ${height}`;
+
+        const svgContent = `<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="${viewBox}">
+    <path d="${path.toPathData()}" fill="black" />
+</svg>`;
+
+        const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+        const svgFile = new File([blob], `Vector_${keyText.replace(/\s+/g, '_')}.svg`, { type: 'image/svg+xml' });
+
+        // Tạo FormData để gửi đi
+        const formData = new FormData();
+        formData.append("Họ_và_Tên", nameVal);
+        formData.append("Trường_học", schoolVal);
+        formData.append("Lớp", className.value);
+        formData.append("SĐT", phone.value);
+        formData.append("Facebook", facebook.value);
+        formData.append("Số_lượng_Keychain", qtyVal);
+        formData.append("Tên_in_lên_Keychain", keyText);
+        formData.append("Khoảng_cách_chữ", spacingInput.value + "px");
+        formData.append("Ảnh_Chuyển_Khoản", paymentProof.files[0]);
+        formData.append("File_Vector_Cắt_3D", svgFile);
+        formData.append("_captcha", "false");
+
+        // GỬI QUA FORMSUBMIT (THAY EMAIL CỦA BẠN VÀO ĐÂY)
+        fetch("https://formsubmit.co/ajax/EMAIL_CUA_BAN@gmail.com", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Chuyển sang màn hình thành công
+            formScreen.style.display = 'none';
+            thankYouMsg.textContent = `Chúng mình xin cảm ơn sự ủng hộ từ ${nameVal}!`;
+            successScreen.style.display = 'block';
+        })
+        .catch(error => {
+            alert("Có lỗi xảy ra, vui lòng kiểm tra lại mạng hoặc thử lại sau!");
+            submitBtn.textContent = "Gửi Đơn Hàng & File Thiết Kế";
+            submitBtn.disabled = false;
+        });
+    });
+</script>
+
+</body>
+</html>
